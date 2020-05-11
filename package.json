@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Avec-em/tinyapp/issues"
   },
-  "homepage": "https://github.com/Avec-em/tinyapp#readme"
+  "homepage": "https://github.com/Avec-em/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
