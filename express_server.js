@@ -5,9 +5,12 @@ const PORT = 8080;
 app.set('view engine', 'ejs')
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
+  "b2xVn2": "http://www.youtube.com",
   "9sm5xK": "http://www.google.com"
 };
+
+console.log(urlDatabase)
+console.log(urlDatabase.b2xVn2)
 
 app.get('/', (req, res) => {
   res.send('Hello!');
@@ -27,7 +30,7 @@ app.get('/urls', (req, res) => {
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  let templateVar = { shortURL: req.params.shortURL, longURL: req.params.longURL };
+  let templateVar = { shortURL: req.params.shortURL, longURL: urlDatabase.shortURL };
   res.render('url_shows', templateVar)
 })
 
