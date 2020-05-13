@@ -44,8 +44,16 @@ app.post("/urls", (req, res) => {
   console.log(urlDatabase);
 });
 
+// handles the edit request from client
+app.post('/urls/:id', (req, res) => {
+  let newlongURL = req.body.newlongURL
+  urlDatabase[req.body.shortURL] = newlongURL
+  console.log(req.params['id'])
+  
+});
+
 // redirects shortURL link to longURL
-app.get("/u/:shortURL", (req, res) => {
+app.get('/u/:shortURL', (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });
@@ -55,6 +63,8 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   delete urlDatabase[req.params.shortURL]
   res.redirect('/urls')
 });
+
+//last route should be 404 catch
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
