@@ -11,12 +11,12 @@
       </div>
     </div>
     <% if(user_id) { %>
-      <a class="nav-item nav-link" href="/urls" stye="padding-right: 10px">Logged in as: <%= email %></a>
+      <a class="nav-item nav-link" href="/urls" stye="padding-right: 10px">Logged in as: <%= users[user_id].email %></a>
+    
       
       <form class="form-inline" action="/logout" method="POST">
         <button type="submit" class="btn btn-outline-secondary" style="margin-right: 10px">Logout</button>
       </form>
-      <p> <% user_id %></p>
       <% } else {%>
       <form class="form-inline" action="/login" method="GET"> 
         <button type="submit" class="btn btn-outline-dark">Log in</button>

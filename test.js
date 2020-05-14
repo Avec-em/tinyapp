@@ -1,24 +1,43 @@
+// URL Database ================================================
+const urlDatabase = {
+  b6UTxQ: { 
+    longURL: "https://www.tsn.ca", 
+    user_id: "userRandomID" 
+  },
+  i3BoGr: { 
+    longURL: "https://www.google.ca", 
+    user_id: "aJ48lW" 
+  },
+  htys90: {
+    longURL: "https://www.aritzia.com",
+    user_id: "aJ48lW"
+  }
+};
+
+if (urlDatabase['htys90']['user_id'] === 'aJ48lW') {
+  console.log('ya')
+}
+
+// Users Database ===============================================
 const usersDatabase = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
     password: "purple-monkey-dinosaur"
   },
-  "user2RandomID": {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk"
+  "aJ48lW": {
+    id: "aJ48lW",
+    email: "emilymnicholas@gmail.com",
+    password: "123"
   }
 };
 
-const emailDupilcates = function(object, key, email) {
+const urlDB = function(object, user_id) {
   for (let i of Object.keys(object)) {
-    if (object[i][key] === email) {
-      return true
+    if(object[i]['user_id'] === user_id)
+    console.log(object[i]['user_id'])
     }
-  }
-  return false
-};
+}
 
 
-console.log(emailDupilcates(usersDatabase, 'email', 'user2@example.com'))
+  //urlDB(urlDatabase)
