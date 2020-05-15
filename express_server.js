@@ -7,10 +7,10 @@ const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 const app = express();
 const PORT = 8080;
+const { checkDuplicates } = require ('./helpers')
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
 app.use(cookieParser());
-
 app.use(cookieSession({
   name: 'session',
   keys: ['Shh-Secret'],
@@ -21,15 +21,6 @@ const generateRandomString = function() {
   return Math.random().toString(20).substr(2, 6);
 };
 
-// Function for checking email/pass ========================================
-const checkDuplicates = function(object, key, value) {
-  for (let i of Object.keys(object)) {
-    if (object[i][key] === value) {
-      return true
-    }
-  }
-  return false
-};
 
 // Function for filtering URLS =============================================
 const filterURL = function(uId) {
