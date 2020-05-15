@@ -14,10 +14,6 @@ const urlDatabase = {
   }
 };
 
-if (urlDatabase['htys90']['user_id'] === 'aJ48lW') {
-  console.log('ya')
-}
-
 // Users Database ===============================================
 const usersDatabase = {
   "userRandomID": {
@@ -32,12 +28,13 @@ const usersDatabase = {
   }
 };
 
-const urlDB = function(object, user_id) {
+const findUserPass = function (object, email) {
   for (let i of Object.keys(object)) {
-    if(object[i]['user_id'] === user_id)
-    console.log(object[i]['user_id'])
+    if (object[i]['email'] === email) {
+      return object[i]['password']
     }
-}
+  }
+};
 
 
-  //urlDB(urlDatabase)
+console.log(findUserPass(usersDatabase, 'user@example.com'))

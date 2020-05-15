@@ -1,24 +1,21 @@
-// TinyApp Dependancies
+// Em's TinyApp MiddleWare ====================================
 
 const express = require('express');
+const cookieParser = require('cookie-parser');
+const bodyParser = require("body-parser");
+const bcrypt = require('bcrypt');
 const app = express();
 const PORT = 8080;
-
+app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
-
-const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
-const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({extended: true}));
-
-
-// Function for generating random string ======================
+// Function for generating random string ===================================
 const generateRandomString = function() {
   return Math.random().toString(20).substr(2, 6);
 };
 
-// function for looping through usersDatabase
+// Function for checking email/pass ========================================
 const checkDuplicates = function(object, key, value) {
   for (let i of Object.keys(object)) {
     if (object[i][key] === value) {
@@ -28,18 +25,7 @@ const checkDuplicates = function(object, key, value) {
   return false
 };
 
-// function for looping through urlDatabse
-const urlDB = function(object, key, value) {
-  for (let i of Object.keys(object)) {
-    if (object[i][key] === value) {
-      return true
-    }
-  }
-  return false
-};
-
-
-// function for filtering URLS ================================
+// Function for filtering URLS =============================================
 const filterURL = function(uId) {
   let filtered = {};
   for (let url in urlDatabase) {
@@ -49,9 +35,8 @@ const filterURL = function(uId) {
   return filtered
 }
 
-
-// function for finding userID =================================
-const findUser = function (object, key, email) {
+// Function for finding userID =============================================
+const findUserID = function (object, key, email) {
   for (let i of Object.keys(object)) {
     if (object[i][key] === email) {
       return object[i]['id']
@@ -59,44 +44,51 @@ const findUser = function (object, key, email) {
   }
 };
 
-// URL Database ================================================
+const findUserPass = function (object, email) {
+  for (let i of Object.keys(object)) {
+    if (object[i]['email'] === email) {
+      return object[i]['password']
+    }
+  }
+};
+
+// URL Database ============================================================
 const urlDatabase = {
   b6UTxQ: { 
     longURL: "https://www.tsn.ca", 
-    user_id: "userRandomID" 
+    user_id: "6741j2" 
   },
   i3BoGr: { 
     longURL: "https://www.google.ca", 
-    user_id: "aJ48lW" 
+    user_id: "4iddg5" 
   },
   htys90: {
     longURL: "https://www.aritzia.com",
-    user_id: "aJ48lW"
+    user_id: "4iddg5"
   }
 };
 
-// Users Database ===============================================
+// Users Database ==========================================================
 const usersDatabase = {
-  "userRandomID": {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+  '4iddg5': {
+    id: '4iddg5',
+    email: 'emilymnicholas@gmail.com',
+    password: '$2b$10$JZaLxXgFi.uR4lts0ai8tuGpb06xikNo81Z/UewXzGiVlDRbh9hmS'
   },
-  "aJ48lW": {
-    id: "aJ48lW",
-    email: "emilymnicholas@gmail.com",
-    password: "123"
+  '6741j2': {
+    id: '6741j2',
+    email: 'jstamos@compass.com',
+    password: '$2b$10$tnhEfM/Gf1uFAV8z0Mb7v.EiCHIKpWXDdtpn5QTRfLf0hMyY51Ze2'
   }
+
 };
 
-
-
-//URLS JSON
+//URLS.JSON ================================================================
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
 
-//serves show all url page
+// Serves user list of their URLS ==========================================
 app.get('/urls', (req, res) => {
   const { user_id } = req.cookies;
   if(user_id in usersDatabase) {
@@ -112,7 +104,7 @@ app.get('/urls', (req, res) => {
   }
 });
 
-//serves create url page
+// Serves user create new URL page =========================================
 app.get("/urls/new", (req, res) => {
   const { user_id } = req.cookies;
   if(user_id in usersDatabase) {
@@ -127,7 +119,7 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
-//serves showurl with shortURL
+// Serves user single chosen URL ===========================================
 app.get('/urls/:shortURL', (req, res) => {
   if (urlDatabase[req.params.shortURL]['user_id'] === req.cookies.user_id){
   let templateVar = {
@@ -142,13 +134,13 @@ app.get('/urls/:shortURL', (req, res) => {
 }
 });
 
-// serves urlshow and creates shortURL link which leads to longURL
+// Redirects user to chosen longURL ========================================
 app.get('/u/:shortURL', (req, res) => {
   let longURL = urlDatabase[req.params.shortURL]['longURL'];
   res.redirect(longURL);
 });
 
-//handles the creation of a new url and adds it to the url Database
+// Handles user created URLS and redirects to view =========================
 app.post("/urls", (req, res) => {
   let shorty = generateRandomString();
   urlDatabase[shorty] = {
@@ -159,7 +151,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shorty}`);
 });
 
-// handles the delete request from client
+// Handles url delete ======================================================
 app.post('/urls/:shortURL/delete', (req, res) => {
   const { user_id } = req.cookies;
   if(user_id in usersDatabase) {
@@ -171,7 +163,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   }
 });
 
-// handles the edit request from client and updates the url Database
+// Handles url edit ========================================================
 app.post('/urls/:shortURL/update', (req, res) => {
   const { user_id } = req.cookies;
   if(user_id in usersDatabase) {
@@ -186,7 +178,7 @@ app.post('/urls/:shortURL/update', (req, res) => {
   }
 });
 
-//serves register page when requested
+// Serves user Register page ===============================================
 app.get('/register', (req, res) => {
   let templateVar = {
     user_id: req.cookies.user_id,
@@ -195,7 +187,7 @@ app.get('/register', (req, res) => {
   res.render('user_reg', templateVar);
 });
 
-//serves user registration page and adds user to the database
+// Handles user registration and adds to usersDatabase =====================
 app.post('/register', (req, res) => {
   if (req.body.email === '' || req.body.password === ''){
     console.log('yes, this condition was met');
@@ -205,11 +197,13 @@ app.post('/register', (req, res) => {
     res.status(400).send('Email already registered')
   } 
   else {
+    const password = req.body.password
+    const hash = bcrypt.hashSync(password, 10);
     let shorty = generateRandomString()
     usersDatabase[shorty] = {
       id: shorty,
       email: req.body.email,
-      password: req.body.password
+      password: hash
     };
     console.log(usersDatabase)
     res.cookie('user_id', `${shorty}`);
@@ -217,26 +211,7 @@ app.post('/register', (req, res) => {
   }
 }); 
 
-//handles the login from client
-app.post('/login', (req, res) => {
-  if (req.body.email === '' || req.body.password === ''){
-    res.status(400).send('Please enter both email and password')
-  } 
-  else if (!checkDuplicates(usersDatabase, 'email', req.body.email)) { 
-    res.status(400).send('Email not registered')
-  } 
-  else if (!checkDuplicates(usersDatabase, 'password', req.body.password)) {
-    res.status(400).send('Password not found, please try again')
-  }
-   else  {
-     //
-    res.cookie('user_id', findUser(usersDatabase, 'email', req.body.email));
-    //change function name to findUserID
-    res.redirect('/urls');
-  }
-});
-
-//serves login page
+// Serves Log in page ======================================================
 app.get('/login', (req, res) => {
   let templateVar = {
     user_id: req.cookies.user_id,
@@ -245,20 +220,38 @@ app.get('/login', (req, res) => {
   res.render('loginPage', templateVar);
 })
 
-//handles the logout from client
+// Handles login of user ===================================================
+app.post('/login', (req, res) => {
+  const userPassword = findUserPass(usersDatabase, req.body.email)
+  if (req.body.email === '' || req.body.password === ''){
+    res.status(400).send('Please enter both email and password')
+  } 
+  else if (!checkDuplicates(usersDatabase, 'email', req.body.email)) { 
+    res.status(400).send('Email not registered')
+  } 
+  else if (!bcrypt.compareSync(req.body.password, userPassword)) {
+    res.status(400).send('Password not found, please try again')
+  }
+   else  {
+     //
+    res.cookie('user_id', findUserID(usersDatabase, 'email', req.body.email));
+    res.redirect('/urls');
+  }
+});
+
+// Handles user logout =====================================================
 app.post('/logout', (req, res) => {
   res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
+// Handles all unknown url/:id =============================================
 app.get('*', (req, res) =>{
   res.status(404).send('Page not found')
 })
 
-// listening at port 8080
+// Listening ===============================================================
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 });
 
-
-//remove email cookie - get from userDatabase from user_id
