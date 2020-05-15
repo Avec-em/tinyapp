@@ -20,3 +20,10 @@
 
 - Install all dependencies (using the `npm install` command).
 - Run the development web server using the `node express_server.js` command.
+- Edit the scripts section of your package.json to look like the following
+```
+"scripts": {
+  "start": "./node_modules/.bin/nodemon -L express_server.js",
+  "test": "echo \"Error: no test specified\" && exit 1"
+}
+``` 

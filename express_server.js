@@ -77,12 +77,6 @@ const usersDatabase = {
 };
 
 //URLS.JSON ================================================================
-app.get('/urls.json', (req, res) => {
-  res.json(urlDatabase);
-});
-
-
-//URLS.JSON ================================================================
 app.get('/', (req, res) => {
   const { user_id } = req.session;
   if (user_id in usersDatabase) {
@@ -107,6 +101,7 @@ app.get('/urls', (req, res) => {
       user_id: req.session.user_id,
     };
     res.render('url_index', templateVar);
+    //if you are not logged in, error with links
   } else {
     res.send('To view this page, please <a href="/login">Log in</a> or <a href="/Register">Register</a>');
   }
@@ -121,6 +116,7 @@ app.get('/urls/new', (req, res) => {
       users: usersDatabase,
     };
     res.render('urls_new', templateVar);
+    //if you are not logged in, please do so
   } else {
     res.redirect('/login');
   }
@@ -128,6 +124,7 @@ app.get('/urls/new', (req, res) => {
 
 // Serves user single chosen URL ===========================================
 app.get('/urls/:shortURL', (req, res) => {
+  // if shortURL requested is associated with your user_id cookie, serve requested page
   if (urlDatabase[req.params.shortURL]['user_id'] === req.session.user_id) {
     let templateVar = {
       shortURL: req.params.shortURL,
@@ -136,6 +133,7 @@ app.get('/urls/:shortURL', (req, res) => {
       users: usersDatabase
     };
     res.render('url_shows', templateVar);
+    // else log in or register
   } else {
     res.send('You are only able to view URL\'s that belong to you. Please <a href="/login">Log in</a> or <a href="/Register">Register</a>');
   }
@@ -163,6 +161,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   if (user_id in usersDatabase) {
     delete urlDatabase[req.params.shortURL];
     res.redirect('/urls');
+    // cannot delete unless it is your URL
   } else {
     res.send('not allowed to delete URL\'s that are not yours');
   }
@@ -176,6 +175,7 @@ app.post('/urls/:shortURL/update', (req, res) => {
     urlDatabase[req.params.shortURL].longURL = newlongURL;
 
     res.redirect('/urls');
+        // cannot edit unless it is your URL
   } else {
     res.send('not allowed to edit URL\'s that are not yours');
   }
@@ -213,7 +213,7 @@ app.post('/register', (req, res) => {
       email: req.body.email,
       password: hash
     };
-    console.log(usersDatabase);
+    //setting user_id
     req.session.user_id = `${shorty}`;
     res.redirect('/urls');
   }
@@ -244,6 +244,7 @@ app.post('/login', (req, res) => {
   } else if (!bcrypt.compareSync(req.body.password, userPassword)) {
     res.status(400).send('Password not found, please try again');
   } else {
+    // setting user_id cookie after finding it in current usersDatabase
     req.session.user_id = findUserID(usersDatabase, 'email', req.body.email);
     res.redirect('/urls');
   }
@@ -251,6 +252,7 @@ app.post('/login', (req, res) => {
 
 // Handles user logout =====================================================
 app.post('/logout', (req, res) => {
+  //clears cookies!
   req.session = null;
   res.redirect('/urls');
 });
