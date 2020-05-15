@@ -27,3 +27,5 @@
   "test": "echo \"Error: no test specified\" && exit 1"
 }
 ``` 
+- From now on, start the server by running npm start :)
+- Have fun :)

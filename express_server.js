@@ -1,4 +1,4 @@
-// Em's TinyApp MiddleWare ====================================
+// Em's TinyApp MiddleWare/Functions ======================================
 
 const express = require('express');
 const cookieSession = require('cookie-session');
@@ -7,17 +7,15 @@ const bcrypt = require('bcrypt');
 const app = express();
 const PORT = 8080;
 const { checkDuplicates } = require('./helpers');
+const { generateRandomString } = require('./helpers');
+const { findUserPass } = require('./helpers');
+const { findUserID } = require('./helpers');
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
 app.use(cookieSession({
   name: 'Shh-secret',
   keys: ['Secret', 'rotation'],
 }));
-
-// Function for generating random string ===================================
-const generateRandomString = function() {
-  return Math.random().toString(20).substr(2, 6);
-};
 
 // Function for filtering URLS =============================================
 const filterURL = function(uId) {
@@ -27,23 +25,6 @@ const filterURL = function(uId) {
       filtered[url] = urlDatabase[url];
   }
   return filtered;
-};
-
-// Function for finding userID =============================================
-const findUserID = function(object, key, email) {
-  for (let i of Object.keys(object)) {
-    if (object[i][key] === email) {
-      return object[i]['id'];
-    }
-  }
-};
-
-const findUserPass = function(object, email) {
-  for (let i of Object.keys(object)) {
-    if (object[i]['email'] === email) {
-      return object[i]['password'];
-    }
-  }
 };
 
 // URL Database ============================================================
@@ -76,7 +57,7 @@ const usersDatabase = {
   }
 };
 
-//URLS.JSON ================================================================
+//URL ======================================================================
 app.get('/', (req, res) => {
   const { user_id } = req.session;
   if (user_id in usersDatabase) {
@@ -87,7 +68,7 @@ app.get('/', (req, res) => {
     };
     res.render('url_index', templateVar);
   } else {
-    res.redirect('/urls');
+    res.redirect('/login');
   }
 });
 
@@ -141,6 +122,9 @@ app.get('/urls/:shortURL', (req, res) => {
 
 // Redirects user to chosen longURL ========================================
 app.get('/u/:shortURL', (req, res) => {
+  if(res.status() === 500) {
+    res.send('hi')
+  }
   let longURL = urlDatabase[req.params.shortURL]['longURL'];
   res.redirect(longURL);
 });
@@ -240,9 +224,9 @@ app.post('/login', (req, res) => {
   if (req.body.email === '' || req.body.password === '') {
     res.status(400).send('Please enter both email and password');
   } else if (!checkDuplicates(usersDatabase, req.body.email)) {
-    res.status(400).send('Email not registered');
+    res.status(400).send('Email not registered, please try again -  <a href="/login">back</a>');
   } else if (!bcrypt.compareSync(req.body.password, userPassword)) {
-    res.status(400).send('Password not found, please try again');
+    res.status(400).send('Password not found, please try again -  <a href="/login">back</a>');
   } else {
     // setting user_id cookie after finding it in current usersDatabase
     req.session.user_id = findUserID(usersDatabase, 'email', req.body.email);
