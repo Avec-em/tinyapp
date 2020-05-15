@@ -1,7 +1,7 @@
 // Function for checking email/pass ========================================
-const checkDuplicates = function(object, key, value) {
+const checkDuplicates = function(object, value) {
   for (let i of Object.keys(object)) {
-    if (object[i][key] === value) {
+    if (object[i]['email'] === value) {
       return true
     }
   }

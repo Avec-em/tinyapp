@@ -12,15 +12,14 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
 app.use(cookieParser());
 app.use(cookieSession({
-  name: 'session',
-  keys: ['Shh-Secret'],
+  name: 'Shh-secret',
+  keys: ['Secret', 'rotation'],
 }))
 
 // Function for generating random string ===================================
 const generateRandomString = function() {
   return Math.random().toString(20).substr(2, 6);
 };
-
 
 // Function for filtering URLS =============================================
 const filterURL = function(uId) {
@@ -85,6 +84,23 @@ app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
 
+
+//URLS.JSON ================================================================
+app.get('/', (req, res) => {
+  const { user_id } = req.session;
+  if(user_id in usersDatabase) {
+    const loggedInUser = usersDatabase[user_id];
+    let templateVar = {
+      urls: filterURL(user_id),
+      users: usersDatabase,
+      user_id: req.session.user_id,
+    };
+    res.render('url_index', templateVar);
+  } else {
+    res.redirect('/urls')
+  }
+});
+
 // Serves user list of their URLS ==========================================
 app.get('/urls', (req, res) => {
   const { user_id } = req.session;
@@ -97,7 +113,7 @@ app.get('/urls', (req, res) => {
     };
     res.render('url_index', templateVar);
   } else {
-    res.send('Please <a href="/login">Log in</a> or <a href="/Register">Register</a>')
+    res.send('To view this page, please <a href="/login">Log in</a> or <a href="/Register">Register</a>')
   }
 });
 
@@ -190,7 +206,7 @@ app.post('/register', (req, res) => {
     console.log('yes, this condition was met');
     res.status(400).send('Please enter both email and password')
   } 
-  else if (checkDuplicates(usersDatabase, 'email', req.body.email)) { 
+  else if (checkDuplicates(usersDatabase, req.body.email)) { 
     res.status(400).send('Email already registered')
   } 
   else {
@@ -223,7 +239,7 @@ app.post('/login', (req, res) => {
   if (req.body.email === '' || req.body.password === ''){
     res.status(400).send('Please enter both email and password')
   } 
-  else if (!checkDuplicates(usersDatabase, 'email', req.body.email)) { 
+  else if (!checkDuplicates(usersDatabase, req.body.email)) { 
     res.status(400).send('Email not registered')
   } 
   else if (!bcrypt.compareSync(req.body.password, userPassword)) {

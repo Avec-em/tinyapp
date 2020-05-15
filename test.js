@@ -1,40 +1,29 @@
-// URL Database ================================================
-const urlDatabase = {
-  b6UTxQ: { 
-    longURL: "https://www.tsn.ca", 
-    user_id: "userRandomID" 
-  },
-  i3BoGr: { 
-    longURL: "https://www.google.ca", 
-    user_id: "aJ48lW" 
-  },
-  htys90: {
-    longURL: "https://www.aritzia.com",
-    user_id: "aJ48lW"
-  }
-};
+const { assert } = require('chai');
 
-// Users Database ===============================================
-const usersDatabase = {
+const { checkDuplicates } = require('./helpers.js');
+
+const testUsers = {
   "userRandomID": {
-    id: "userRandomID",
-    email: "user@example.com",
+    id: "userRandomID", 
+    email: "user@example.com", 
     password: "purple-monkey-dinosaur"
   },
-  "aJ48lW": {
-    id: "aJ48lW",
-    email: "emilymnicholas@gmail.com",
-    password: "123"
+  "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
   }
 };
 
-const findUserPass = function (object, email) {
-  for (let i of Object.keys(object)) {
-    if (object[i]['email'] === email) {
-      return object[i]['password']
-    }
-  }
-};
-
-
-console.log(findUserPass(usersDatabase, 'user@example.com'))
+describe('checkDuplicates', function() {
+  it('should return true as user@example is in database', function() {
+    const user = checkDuplicates(testUsers, "user@example.com")
+    const expectedOutput = true;
+    assert(user === expectedOutput, "true is = to true");
+  });
+  it('should return false as Monkey@example is not in database', function() {
+    const user = checkDuplicates(testUsers, "monkey@example.com")
+    const expectedOutput = false;
+    assert(user === expectedOutput, "false is = false");
+  });
+});
