@@ -4,8 +4,8 @@
 
 ## Final Product
 
-!["screenshot description"](#)
-!["screenshot description"](#)
+!["Register Page"](https://github.com/Avec-em/tinyapp/blob/master/Screen%20Shot%202020-05-14%20at%2011.12.42%20PM.png)
+!["/URLs"](https://github.com/Avec-em/tinyapp/blob/master/Screen%20Shot%202020-05-14%20at%2011.12.58%20PM.png)
 
 ### Dependencies
 
